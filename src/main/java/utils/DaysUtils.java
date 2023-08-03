@@ -3,6 +3,7 @@ package utils;
 
 import model.DateEntity;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -11,6 +12,8 @@ import java.util.*;
  * @date 2021/5/15 16:34
  */
 public class DaysUtils {
+    
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 
     // 初始化月份天数
@@ -74,6 +77,20 @@ public class DaysUtils {
     }
 
     /**
+     *
+     *  重载getBetweenDays方法，接受字符串形式日期
+     *
+     *     格式注意 为  yyyy-MM-dd  eg: 2022-02-01
+     *
+     * @param newDate   起始时间
+     * @param oldDate   结束时间
+     * @return      间隔时间实体
+     * @throws ParseException   解析异常，一般为格式异常导致
+     */
+    public static DateEntity getBetweenDays(String newDate, String oldDate) throws ParseException {
+        return getBetweenDays(DATE_FORMAT.parse(newDate),DATE_FORMAT.parse(oldDate));
+    }
+    /**
      * 计算两个日期间的天数
      * 保证了总是大的减小的日期
      * <p>
@@ -106,39 +123,39 @@ public class DaysUtils {
 
         DateEntity dateEntity = new DateEntity();
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
         //下面区域代码块功能为保证总是大的日期减去小的日期
 
         //首先比较年份，如果年份相同继续比较月份
-        if (Integer.parseInt(dateFormat.format(newDate).split("-")[0]) == Integer.parseInt(dateFormat.format(oldDate).split("-")[0])) {
+        if (Integer.parseInt(DATE_FORMAT.format(newDate).split("-")[0]) == Integer.parseInt(DATE_FORMAT.format(oldDate).split("-")[0])) {
 
             //如果月份小于后者，则交换日期位置，大于不变
-            if (Integer.parseInt(dateFormat.format(newDate).split("-")[1]) < Integer.parseInt(dateFormat.format(oldDate).split("-")[1])) {
+            if (Integer.parseInt(DATE_FORMAT.format(newDate).split("-")[1]) < Integer.parseInt(DATE_FORMAT.format(oldDate).split("-")[1])) {
                 Date temp = oldDate;
                 oldDate = newDate;
                 newDate = temp;
             }
 
             //如果月份等于后者，则比较日期
-            if (Integer.parseInt(dateFormat.format(newDate).split("-")[1]) == Integer.parseInt(dateFormat.format(oldDate).split("-")[1])) {
+            if (Integer.parseInt(DATE_FORMAT.format(newDate).split("-")[1]) == Integer.parseInt(DATE_FORMAT.format(oldDate).split("-")[1])) {
 
                 //如果日期小于，则交换日期位置，大于不变
-                if (Integer.parseInt(dateFormat.format(newDate).split("-")[2]) < Integer.parseInt(dateFormat.format(oldDate).split("-")[2])) {
+                if (Integer.parseInt(DATE_FORMAT.format(newDate).split("-")[2]) < Integer.parseInt(DATE_FORMAT.format(oldDate).split("-")[2])) {
                     Date temp = oldDate;
                     oldDate = newDate;
                     newDate = temp;
                 }
 
                 //如果日期相等，至此日期完全相同，直接返回天数0
-                if (Integer.parseInt(dateFormat.format(newDate).split("-")[2]) == Integer.parseInt(dateFormat.format(oldDate).split("-")[2])) {
+                if (Integer.parseInt(DATE_FORMAT.format(newDate).split("-")[2]) == Integer.parseInt(DATE_FORMAT.format(oldDate).split("-")[2])) {
                     dateEntity.setTotalDays(0);
                     return dateEntity;
                 }
             }
 
             //如期年份小于后者，则发生交换。
-        } else if (Integer.parseInt(dateFormat.format(newDate).split("-")[0]) < Integer.parseInt(dateFormat.format(oldDate).split("-")[0])) {
+        } else if (Integer.parseInt(DATE_FORMAT.format(newDate).split("-")[0]) < Integer.parseInt(DATE_FORMAT.format(oldDate).split("-")[0])) {
             Date temp = oldDate;
             oldDate = newDate;
             newDate = temp;
@@ -148,14 +165,14 @@ public class DaysUtils {
         //下面这部分用于计算
 
         // 日期处理
-        String dateStr1 = dateFormat.format(oldDate);
+        String dateStr1 = DATE_FORMAT.format(oldDate);
         String[] split1 = dateStr1.split("-");
         int year1 = Integer.parseInt(split1[0]);
         int months1 = Integer.parseInt(split1[1]);
         int day1 = Integer.parseInt(split1[2]);
 
 
-        String dateStr2 = dateFormat.format(newDate);
+        String dateStr2 = DATE_FORMAT.format(newDate);
         String[] split2 = dateStr2.split("-");
         int year2 = Integer.parseInt(split2[0]);
         int months2 = Integer.parseInt(split2[1]);

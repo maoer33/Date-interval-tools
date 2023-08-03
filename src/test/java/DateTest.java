@@ -13,9 +13,8 @@ public class DateTest {
 
     public static void main(String[] args) throws ParseException {
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        DateEntity dateEntity = DaysUtils.getBetweenDays(dateFormat.parse("2019-9-2"),dateFormat.parse("2021-3-29"));
+        DateEntity dateEntity = DaysUtils.getBetweenDays("2019-9-2","2021-3-29");
 
         System.out.println("间隔时间：\t"+dateEntity.getYear()+"\t年\t"+dateEntity.getMonths()+"\t月\t"+dateEntity.getDays()+"\t日\t");
 
