@@ -12,7 +12,7 @@ import java.util.*;
  * @date 2021/5/15 16:34
  */
 public class DaysUtils {
-    
+
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 
@@ -43,13 +43,13 @@ public class DaysUtils {
     /**
      * 根据月份提供该月的天数
      *
-     * @param        months
-     * @return      对应月份的天数
+     * @param months
+     * @return 对应月份的天数
      */
     public static int getMonthsDays(Integer months, Integer year) {
 
         if (months == 2) {
-            if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+            if ((checkYear(year))) {
                 return map.get(months) + 1;
             } else {
                 return map.get(months);
@@ -63,12 +63,12 @@ public class DaysUtils {
     /**
      * 判断年的天数
      *
-     * @param       year
-     * @return      对应年份的天数
+     * @param year
+     * @return 对应年份的天数
      */
     public static int getYearDays(Integer year) {
 
-        if ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+        if ((checkYear(year))) {
             return 366;
         } else {
             return 365;
@@ -77,19 +77,36 @@ public class DaysUtils {
     }
 
     /**
+     * 判断是否闰年
      *
-     *  重载getBetweenDays方法，接受字符串形式日期
+     * @param year 年
+     * @return true 为 闰年    false 不是闰年
+     */
+    public static boolean checkYear(int year) {
+        return (year % 4 == 0 && year % 100 != 0) || year % 400 == 0;
+    }
+
+    /**
+     * 重载getBetweenDays方法，接受字符串形式日期
+     * <p>
+     * 格式注意 为  yyyy-MM-dd  eg: 2022-02-01
      *
-     *     格式注意 为  yyyy-MM-dd  eg: 2022-02-01
-     *
-     * @param newDate   起始时间
-     * @param oldDate   结束时间
-     * @return      间隔时间实体
-     * @throws ParseException   解析异常，一般为格式异常导致
+     * @param newDate 起始时间
+     * @param oldDate 结束时间
+     * @return 间隔时间实体
+     * @throws ParseException 解析异常，一般为格式异常导致
      */
     public static DateEntity getBetweenDays(String newDate, String oldDate) throws ParseException {
-        return getBetweenDays(DATE_FORMAT.parse(newDate),DATE_FORMAT.parse(oldDate));
+        if ("".equals(newDate.trim()) && "".equals(oldDate.trim())) {
+            return new DateEntity(0, 0, 0, 0, 0, 0);
+        }
+
+        return getBetweenDays(Optional.of(newDate).orElse(DATE_FORMAT.format(new Date())),
+                Optional.of(oldDate).orElse(DATE_FORMAT.format(new Date()))
+        );
+
     }
+
     /**
      * 计算两个日期间的天数
      * 保证了总是大的减小的日期
@@ -259,4 +276,94 @@ public class DaysUtils {
         return dateEntity;
 
     }
+
+    /**
+     *
+     *   根据当前日期往后推的天数，得到xx天后的日期
+     *
+     * @param date  传递的日期
+     * @param days  推进的天数
+     * @return  推进后的日期
+     */
+    public static String getAfterDaysDate(String date, int days) {
+        int resultMonth = 0;
+        int resultDays = 0;
+        int totalMonth = 0;
+        StringBuilder sb = new StringBuilder();
+
+        String[] dateStr = date.split("-");
+        int year = Integer.parseInt(dateStr[0]);
+        int month = Integer.parseInt(dateStr[1]);
+        int day = Integer.parseInt(dateStr[2]);
+
+
+
+        // 如果传递的天数小于当前月剩余天数，则直接返回以下逻辑
+        if (days <= (getMonthsDays(month, year) - day)) return buildDate(year,month,day+days);
+
+        // 减去当月剩余天数后还剩下的天数
+        int tempDay = days - (getMonthsDays(month, year) - day);
+        resultDays = tempDay;
+
+        for (int i = 1; i <= (tempDay / 30)+1; i++) {
+            resultMonth++;
+            int nextMonthDays = getNextMonthDays((month+i-1)%12, ((month+i-1) / 12 > 0 ? year + ((month+i-1) /12):year));
+            if (resultDays <= nextMonthDays) break;
+            resultDays -= nextMonthDays;
+        }
+
+        totalMonth = month + resultMonth;
+
+       if (totalMonth / 12 != 0){
+           year += totalMonth / 12;
+       }
+
+       sb.append(year)
+               .append("-")
+               .append(totalMonth % 12)
+               .append("-")
+               .append(resultDays);
+
+
+
+        return sb.toString();
+    }
+
+
+    /**
+     * 返回后一个月的天数
+     *
+     * @param month 月份
+     * @param year  年份
+     * @return 下一个月的天数
+     */
+    public static int getNextMonthDays(int month, int year) {
+        int nextMonthDay;
+        nextMonthDay = switch (month) {
+            case 1 -> checkYear(year) ? 29 : 28;
+            case 12 -> getMonthsDays(1, year + 1);
+            default -> getMonthsDays(month + 1, year);
+        };
+        return nextMonthDay;
+    }
+
+
+
+    /**
+     *
+     *  根据年月日构造标准日期
+     *
+     * @param year   年份
+     * @param month  月份
+     * @param day    天
+     * @return  标准日期
+     */
+    private static String buildDate(int year,int month,int day){
+        return year +
+                "-" +
+                month +
+                "-" +
+                day;
+    }
+
 }
