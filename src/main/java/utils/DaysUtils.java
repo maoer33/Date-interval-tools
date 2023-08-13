@@ -13,7 +13,8 @@ import java.util.*;
  */
 public class DaysUtils {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 
     // 初始化月份天数
